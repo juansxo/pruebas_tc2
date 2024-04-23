@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Electrodomésticos</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    #encabezado {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    #contenedorGrafico {
+      display: flex;
+      align-items: flex-start;
+    }
+
+    #graficoConsumo {
+      max-width: 600px;
+    }
+
+    #interruptores {
+      display: flex;
+      flex-direction: column;
+      margin-left: 20px;
+    }
+
+    .interruptor {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .interruptor label {
+      margin-left: 5px;
+    }
+
+    #botonVolver {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #868686;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Encabezado -->
+<div id="encabezado">
+  <h1>Sistema de Control de Electrodomésticos del Hogar</h1>
+  <p>Monitorea y controla tus electrodomésticos de manera fácil</p>
+</div>
+
+<!-- Contenedor para el gráfico y los interruptores -->
+<div id="contenedorGrafico">
+  <canvas id="graficoConsumo"></canvas>
+  <div id="interruptores">
+    <div class="interruptor">
+      <input type="checkbox" id="interruptorLavadora" onchange="actualizarGrafico('Lavadora')">
+      <label for="interruptorLavadora">Lavadora</label>
+    </div>
+
+    <div class="interruptor">
+      <input type="checkbox" id="interruptorRefrigerador" onchange="actualizarGrafico('Refrigerador')">
+      <label for="interruptorRefrigerador">Refrigerador</label>
+    </div>
+
+    <div class="interruptor">
+      <input type="checkbox" id="interruptorTelevisor" onchange="actualizarGrafico('Televisor')">
+      <label for="interruptorTelevisor">Televisor</label>
+    </div>
+
+    <div class="interruptor">
+      <input type="checkbox" id="interruptorHorno" onchange="actualizarGrafico('Horno')">
+      <label for="interruptorHorno">Horno</label>
+    </div>
+
+    <div class="interruptor">
+      <input type="checkbox" id="interruptorLicuadora" onchange="actualizarGrafico('Licuadora')">
+      <label for="interruptorLicuadora">Licuadora</label>
+    </div>
+
+    <div class="interruptor">
+      <input type="checkbox" id="interruptorCafetera" onchange="actualizarGrafico('Cafetera')">
+      <label for="interruptorCafetera">Cafetera</label>
+    </div>
+
+    <div class="interruptor">
+      <input type="checkbox" id="interruptorMicroondas" onchange="actualizarGrafico('Microondas')">
+      <label for="interruptorMicroondas">Microondas</label>
+    </div>
+
+    <div class="interruptor">
+      <input type="checkbox" id="interruptorSecadora" onchange="actualizarGrafico('Secadora')">
+      <label for="interruptorSecadora">Secadora</label>
+    </div>
+
+    <!-- Agrega más interruptores para otros electrodomésticos -->
+
+  </div>
+</div>
+
+<!-- Botón para volver -->
+<button id="botonVolver" onclick="volver()">Volver</button>
+
+<script>
+  var datosConsumo = {
+    'Lavadora': [10, 15, 20, 25, 18, 22, 30],
+    'Refrigerador': [5, 10, 15, 20, 25, 30, 35],
+    'Televisor': [8, 12, 18, 24, 16, 20, 28],
+    'Horno': [15, 20, 25, 30, 22, 28, 35],
+    'Licuadora': [3, 5, 8, 10, 7, 9, 12],
+    'Cafetera': [2, 3, 4, 5, 3, 4, 6],
+    'Microondas': [6, 8, 10, 12, 9, 11, 14],
+    'Secadora': [12, 18, 24, 30, 20, 25, 32],
+    // Agrega más datos para otros electrodomésticos
+  };
+
+  var ctx = document.getElementById('graficoConsumo').getContext('2d');
+
+  var graficoConsumo = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+      datasets: []
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  function actualizarGrafico(electrodomestico) {
+    var checkbox = document.getElementById('interruptor' + electrodomestico);
+    var datasetIndex = graficoConsumo.data.datasets.findIndex(dataset => dataset.label === electrodomestico);
+
+    if (checkbox.checked) {
+      if (datasetIndex === -1) {
+        graficoConsumo.data.datasets.push({
+          label: electrodomestico,
+          borderColor: getRandomColor(),
+          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          data: datosConsumo[electrodomestico],
+        });
+      }
+    } else {
+      if (datasetIndex !== -1) {
+        graficoConsumo.data.datasets.splice(datasetIndex, 1);
+      }
+    }
+
+    graficoConsumo.update();
+  }
+
+  function volver() {
+    window.location.href = "index.html";
+  }
+
+  // Función para obtener un color aleatorio
+  function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+</script>
+
+</body>
+</html>
